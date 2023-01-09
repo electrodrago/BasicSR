@@ -10,8 +10,8 @@ datasets:
   train:
     name: REDS
     type: REDSRecurrentDataset
-    dataroot_gt: datasets/REDS/train_sharp
-    dataroot_lq: datasets/REDS/train_sharp_bicubic/X4
+    dataroot_gt: /content/drive/MyDrive/1THESIS/train/train_sharp
+    dataroot_lq: /content/drive/MyDrive/1THESIS/train/train_sharp_bicubic/X4
     meta_info_file: basicsr/data/meta_info/meta_info_REDS_GT.txt
     val_partition: REDS4  # set to 'official' when use the official validation partition
     test_mode: False
@@ -26,22 +26,22 @@ datasets:
     use_rot: true
 
     # data loader
-    num_worker_per_gpu: 6
+    num_worker_per_gpu: 2
     batch_size_per_gpu: 4
-    dataset_enlarge_ratio: 200
+    dataset_enlarge_ratio: 1
     prefetch_mode: ~
 
-  val:
-    name: REDS4
-    type: VideoRecurrentTestDataset
-    dataroot_gt: datasets/REDS4/GT
-    dataroot_lq: datasets/REDS4/sharp_bicubic
+  # val:
+  #   name: REDS4
+  #   type: VideoRecurrentTestDataset
+  #   dataroot_gt: datasets/REDS4/GT
+  #   dataroot_lq: datasets/REDS4/sharp_bicubic
 
-    cache_data: true
-    io_backend:
-      type: disk
+  #   cache_data: true
+  #   io_backend:
+  #     type: disk
 
-    num_frame: -1  # not needed
+  #   num_frame: -1  # not needed
 
 # network structures
 network_g:
