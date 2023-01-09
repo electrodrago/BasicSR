@@ -1,0 +1,602 @@
+/content/BasicSR
+Disable distributed.
+
+# ------------- logger.info(get_env_info()) --------------
+2022-12-30 07:09:19,031 INFO:
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+
+Version Information:
+	BasicSR: 1.4.2
+	PyTorch: 1.13.0+cu116
+	TorchVision: 0.14.0+cu116
+
+# ------------- logger.info(dict2str()) --------------
+2022-12-30 07:09:19,031 INFO:
+  name: BasicVSR_REDS
+  model_type: VideoRecurrentModel
+  scale: 4
+  num_gpu: 1
+  manual_seed: 0
+  datasets:[
+    train:[
+      name: REDS
+      type: REDSRecurrentDataset
+      dataroot_gt: /content/drive/MyDrive/1THESIS/train/train_sharp
+      dataroot_lq: /content/drive/MyDrive/1THESIS/train/train_sharp_bicubic/X4
+      meta_info_file: /content/BasicSR/basicsr/basicsr/data/meta_info/meta_info_REDS_GT.txt
+      val_partition: REDS4
+      test_mode: False
+      io_backend:[
+        type: disk
+      ]
+      num_frame: 15
+      gt_size: 256
+      interval_list: [1]
+      random_reverse: False
+      use_hflip: True
+      use_rot: True
+      num_worker_per_gpu: 2
+      batch_size_per_gpu: 4
+      dataset_enlarge_ratio: 1
+      prefetch_mode: None
+      phase: train
+      scale: 4
+    ]
+    val:[
+      name: REDS4
+      type: VideoRecurrentTestDataset
+      dataroot_gt: /content/drive/MyDrive/1THESIS/val/val_sharp
+      dataroot_lq: /content/drive/MyDrive/1THESIS/val/val_sharp_bicubic/X4
+      cache_data: True
+      io_backend:[
+        type: disk
+      ]
+      num_frame: -1
+      phase: val
+      scale: 4
+    ]
+  ]
+  network_g:[
+    type: BasicVSR
+    num_feat: 64
+    num_block: 30
+    spynet_path: /content/BasicSR/spynet_sintel_final-3d2a1287.pth
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: None
+    experiments_root: /content/BasicSR/experiments/BasicVSR_REDS
+    models: /content/BasicSR/experiments/BasicVSR_REDS/models
+    training_states: /content/BasicSR/experiments/BasicVSR_REDS/training_states
+    log: /content/BasicSR/experiments/BasicVSR_REDS
+    visualization: /content/BasicSR/experiments/BasicVSR_REDS/visualization
+  ]
+  train:[
+    ema_decay: 0.999
+    optim_g:[
+      type: Adam
+      lr: 0.0002
+      weight_decay: 0
+      betas: [0.9, 0.99]
+    ]
+    scheduler:[
+      type: CosineAnnealingRestartLR
+      periods: [300000]
+      restart_weights: [1]
+      eta_min: 1e-07
+    ]
+    total_iter: 300000
+    warmup_iter: -1
+    fix_flow: 5000
+    flow_lr_mul: 0.125
+    pixel_opt:[
+      type: CharbonnierLoss
+      loss_weight: 1.0
+      reduction: mean
+    ]
+  ]
+  val:[
+    val_freq: 5000.0
+    save_img: False
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 0
+        test_y_channel: False
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 100
+    save_checkpoint_freq: 5000.0
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  find_unused_parameters: True
+  dist: False
+  rank: 0
+  world_size: 1
+  auto_resume: False
+  is_train: True
+  root_path: /content/BasicSR
+
+# --------------- reds_dataset.py line 91 ------------
+2022-12-30 07:09:21,207 INFO: Temporal augmentation interval list: [1]; random reverse is False.
+
+# --------------- build_dataset line 36 ------------
+2022-12-30 07:09:21,207 INFO: Dataset [REDSRecurrentDataset] - REDS is built.
+
+# --------------- train.py line 78 ----------------
+2022-12-30 07:09:21,207 INFO: Training statistics:
+	Number of train images: 26600
+	Dataset enlarge ratio: 1
+	Batch size per gpu: 4
+	World size (gpu number): 1
+	Require iter number per epoch: 6650
+	Total epochs: 46; iters: 300000.
+
+# -------------- video_test_dataset.py line 58 -------------
+2022-12-30 07:09:21,208 INFO: Generate data info for VideoTestDataset - REDS4
+2022-12-30 07:09:21,208 INFO: Dataset [VideoRecurrentTestDataset] - REDS4 is built.
+2022-12-30 07:09:21,209 INFO: Number of val images/folders in REDS4: 0
+
+----------------------------------------------
+
+
+#  -------- video_recurrent_model -> video_base_model -> sr_model -> base model -> basic vsr
+
+# ------------ self.net_g = build_network(opt['network_g']) line 22
+2022-12-30 07:09:21,388 INFO: Network [BasicVSR] is created.
+
+# ------------ base_model print_network, line 144
+2022-12-30 07:09:27,095 INFO: Network: BasicVSR, with parameters: 6,291,311
+2022-12-30 07:09:27,095 INFO: BasicVSR(
+  (spynet): SpyNet(
+    (basic_module): ModuleList(
+      (0): BasicModule(
+        (basic_module): Sequential(
+          (0): Conv2d(8, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (1): ReLU()
+          (2): Conv2d(32, 64, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (3): ReLU()
+          (4): Conv2d(64, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (5): ReLU()
+          (6): Conv2d(32, 16, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (7): ReLU()
+          (8): Conv2d(16, 2, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+        )
+      )
+      (1): BasicModule(
+        (basic_module): Sequential(
+          (0): Conv2d(8, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (1): ReLU()
+          (2): Conv2d(32, 64, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (3): ReLU()
+          (4): Conv2d(64, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (5): ReLU()
+          (6): Conv2d(32, 16, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (7): ReLU()
+          (8): Conv2d(16, 2, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+        )
+      )
+      (2): BasicModule(
+        (basic_module): Sequential(
+          (0): Conv2d(8, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (1): ReLU()
+          (2): Conv2d(32, 64, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (3): ReLU()
+          (4): Conv2d(64, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (5): ReLU()
+          (6): Conv2d(32, 16, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (7): ReLU()
+          (8): Conv2d(16, 2, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+        )
+      )
+      (3): BasicModule(
+        (basic_module): Sequential(
+          (0): Conv2d(8, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (1): ReLU()
+          (2): Conv2d(32, 64, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (3): ReLU()
+          (4): Conv2d(64, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (5): ReLU()
+          (6): Conv2d(32, 16, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (7): ReLU()
+          (8): Conv2d(16, 2, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+        )
+      )
+      (4): BasicModule(
+        (basic_module): Sequential(
+          (0): Conv2d(8, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (1): ReLU()
+          (2): Conv2d(32, 64, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (3): ReLU()
+          (4): Conv2d(64, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (5): ReLU()
+          (6): Conv2d(32, 16, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (7): ReLU()
+          (8): Conv2d(16, 2, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+        )
+      )
+      (5): BasicModule(
+        (basic_module): Sequential(
+          (0): Conv2d(8, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (1): ReLU()
+          (2): Conv2d(32, 64, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (3): ReLU()
+          (4): Conv2d(64, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (5): ReLU()
+          (6): Conv2d(32, 16, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+          (7): ReLU()
+          (8): Conv2d(16, 2, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+        )
+      )
+    )
+  )
+  (backward_trunk): ConvResidualBlocks(
+    (main): Sequential(
+      (0): Conv2d(67, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+      (2): Sequential(
+        (0): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (1): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (2): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (3): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (4): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (5): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (6): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (7): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (8): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (9): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (10): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (11): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (12): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (13): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (14): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (15): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (16): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (17): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (18): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (19): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (20): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (21): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (22): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (23): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (24): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (25): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (26): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (27): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (28): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (29): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+      )
+    )
+  )
+  (forward_trunk): ConvResidualBlocks(
+    (main): Sequential(
+      (0): Conv2d(67, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+      (2): Sequential(
+        (0): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (1): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (2): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (3): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (4): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (5): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (6): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (7): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (8): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (9): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (10): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (11): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (12): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (13): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (14): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (15): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (16): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (17): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (18): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (19): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (20): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (21): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (22): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (23): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (24): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (25): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (26): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (27): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (28): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+        (29): ResidualBlockNoBN(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (relu): ReLU(inplace=True)
+        )
+      )
+    )
+  )
+  (fusion): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+  (upconv1): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (upconv2): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (conv_hr): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (conv_last): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (pixel_shuffle): PixelShuffle(upscale_factor=2)
+  (lrelu): LeakyReLU(negative_slope=0.1, inplace=True)
+)
+
+# ------------ sr_model line 42 ----------------
+2022-12-30 07:09:27,108 INFO: Use Exponential Moving Average with decay: 0.999
+
+# ------------ sr_model line 46 ----------------
+2022-12-30 07:09:27,217 INFO: Network [BasicVSR] is created.
+
+# ------------ sr_model line 56 ----------------
+2022-12-30 07:09:27,256 INFO: Loss [CharbonnierLoss] is created.
+
+# ------------ video_recurrent_model line 23 ----------------
+2022-12-30 07:09:27,257 INFO: Multiple the learning rate for flow network with 0.125.
+
+# ------------ video_recurrent_model line 28 ----------------
+2022-12-30 07:09:27,258 INFO: Model [VideoRecurrentModel] is created.
+
+# ------------ train.py line 189 ----------------------------
+2022-12-30 07:09:27,329 INFO: Start training from epoch: 0, iter: 0
+
+# ------------ video_recurrent_model line 57 ---------------
+2022-12-30 07:11:16,290 INFO: Fix flow network and feature extractor for 5000 iters.
+/usr/local/lib/python3.8/dist-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at ../aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Traceback (most recent call last):
+
+^C

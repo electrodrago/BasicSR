@@ -1,0 +1,98 @@
+OrderedDict([
+	('name', 'BasicVSR_REDS'),
+	('model_type', 'VideoRecurrentModel'),
+	('scale', 4), ('num_gpu', 1),
+	('manual_seed', 0),
+	('datasets', OrderedDict([
+		('train', OrderedDict([
+			('name', 'REDS'),
+			('type', 'REDSRecurrentDataset'),
+			('dataroot_gt', '/content/drive/MyDrive/1THESIS/train/train_sharp'),
+			('dataroot_lq', '/content/drive/MyDrive/1THESIS/train/train_sharp_bicubic/X4'),
+			('meta_info_file', '/content/BasicSR/basicsr/basicsr/data/meta_info/meta_info_REDS_GT.txt'),
+			('val_partition', 'REDS4'),
+			('test_mode', False),
+			('io_backend', OrderedDict([('type', 'disk')])),
+			('num_frame', 15),
+			('gt_size', 256),
+			('interval_list', [1]),
+			('random_reverse', False),
+			('use_hflip', True),
+			('use_rot', True),
+			('num_worker_per_gpu', 6),
+			('batch_size_per_gpu', 4),
+			('dataset_enlarge_ratio', 200),
+			('prefetch_mode', None), ('phase', 'train'), ('scale', 4)])),
+		('val', OrderedDict([
+			('name', 'REDS4'),
+			('type', 'VideoRecurrentTestDataset'),
+			('dataroot_gt', '/content/drive/MyDrive/1THESIS/val/val_sharp'),
+			('dataroot_lq', '/content/drive/MyDrive/1THESIS/val/val_sharp_bicubic/X4'),
+			('cache_data', True),
+			('io_backend', OrderedDict([
+				('type', 'disk')])),
+			('num_frame', -1),
+			('phase', 'val'),
+			('scale', 4)]))])),
+('network_g', OrderedDict([
+	('type', 'BasicVSR'),
+	('num_feat', 64),
+	('num_block', 30),
+	('spynet_path', '/content/BasicSR/spynet_sintel_final-3d2a1287.pth')])),
+
+('path', OrderedDict([
+	('pretrain_network_g', None),
+	('strict_load_g', True),
+	('resume_state', None),
+	('experiments_root', '/content/BasicSR/experiments/BasicVSR_REDS'),
+	('models', '/content/BasicSR/experiments/BasicVSR_REDS/models'),
+	('training_states', '/content/BasicSR/experiments/BasicVSR_REDS/training_states'),
+	('log', '/content/BasicSR/experiments/BasicVSR_REDS'),
+	('visualization', '/content/BasicSR/experiments/BasicVSR_REDS/visualization')])),
+
+('train', OrderedDict([
+	('ema_decay', 0.999),
+	('optim_g', OrderedDict([
+		('type', 'Adam'),
+		('lr', 0.0002),
+		('weight_decay', 0),
+		('betas', [0.9, 0.99])
+		])),
+	('scheduler', OrderedDict([
+		('type', 'CosineAnnealingRestartLR'),
+		('periods', [300000]),
+		('restart_weights', [1]),
+		('eta_min', 1e-07)
+		])),
+	('total_iter', 300000),
+	('warmup_iter', -1),
+	('fix_flow', 5000),
+	('flow_lr_mul', 0.125),
+	('pixel_opt', OrderedDict([
+		('type', 'CharbonnierLoss'),
+		('loss_weight', 1.0),
+		('reduction', 'mean')]))])),
+('val', OrderedDict([
+	('val_freq', 5000.0),
+	('save_img', False),
+	('metrics', OrderedDict([
+		('psnr', OrderedDict([
+			('type', 'calculate_psnr'),
+			('crop_border', 0),
+			('test_y_channel', False)]))]))])),
+('logger', OrderedDict([
+	('print_freq', 100),
+	('save_checkpoint_freq', 5000.0),
+	('use_tb_logger', True),
+	('wandb', OrderedDict([('project', None), ('resume_id', None)]))
+	])),
+('dist_params', OrderedDict([
+	('backend', 'nccl'),
+	('port', 29500)])),
+('find_unused_parameters', True),
+('dist', False),
+('rank', 0),
+('world_size', 1),
+('auto_resume', False),
+('is_train', True),
+('root_path', '/content/BasicSR')])
