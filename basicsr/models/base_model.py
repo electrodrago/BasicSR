@@ -19,21 +19,27 @@ class BaseModel():
         self.is_train = opt['is_train']
         self.schedulers = []
         self.optimizers = []
+        print("Access 1")
 
     def feed_data(self, data):
+        print("Access 2")
         pass
 
     def optimize_parameters(self):
+        print("Access 3")
         pass
 
     def get_current_visuals(self):
+        print("Access 4")
         pass
 
     def save(self, epoch, current_iter):
         """Save networks and training state."""
+        print("Access 5")
         pass
 
     def validation(self, dataloader, current_iter, tb_logger, save_img=False):
+        print("Access 6")
         """Validation function.
 
         Args:
@@ -48,6 +54,7 @@ class BaseModel():
             self.nondist_validation(dataloader, current_iter, tb_logger, save_img)
 
     def _initialize_best_metric_results(self, dataset_name):
+        print("Access 7")
         """Initialize the best metric results dict for recording the best metric value and iteration."""
         if hasattr(self, 'best_metric_results') and dataset_name in self.best_metric_results:
             return
@@ -63,6 +70,7 @@ class BaseModel():
         self.best_metric_results[dataset_name] = record
 
     def _update_best_metric_result(self, dataset_name, metric, val, current_iter):
+        print("Access 8")
         if self.best_metric_results[dataset_name][metric]['better'] == 'higher':
             if val >= self.best_metric_results[dataset_name][metric]['val']:
                 self.best_metric_results[dataset_name][metric]['val'] = val
@@ -73,6 +81,7 @@ class BaseModel():
                 self.best_metric_results[dataset_name][metric]['iter'] = current_iter
 
     def model_ema(self, decay=0.999):
+        print("Access 9")
         net_g = self.get_bare_model(self.net_g)
 
         net_g_params = dict(net_g.named_parameters())
@@ -82,9 +91,11 @@ class BaseModel():
             net_g_ema_params[k].data.mul_(decay).add_(net_g_params[k].data, alpha=1 - decay)
 
     def get_current_log(self):
+        print("Access 10")
         return self.log_dict
 
     def model_to_device(self, net):
+        print("Access 11")
         """Model to device. It also warps models with DistributedDataParallel
         or DataParallel.
 
@@ -101,6 +112,7 @@ class BaseModel():
         return net
 
     def get_optimizer(self, optim_type, params, lr, **kwargs):
+        print("Access 12")
         if optim_type == 'Adam':
             optimizer = torch.optim.Adam(params, lr, **kwargs)
         elif optim_type == 'AdamW':
@@ -120,6 +132,7 @@ class BaseModel():
         return optimizer
 
     def setup_schedulers(self):
+        print("Access 13")
         """Set up schedulers."""
         train_opt = self.opt['train']
         scheduler_type = train_opt['scheduler'].pop('type')
@@ -133,6 +146,7 @@ class BaseModel():
             raise NotImplementedError(f'Scheduler {scheduler_type} is not implemented yet.')
 
     def get_bare_model(self, net):
+        print("Access 14")
         """Get bare model, especially under wrapping with
         DistributedDataParallel or DataParallel.
         """
@@ -142,6 +156,7 @@ class BaseModel():
 
     @master_only
     def print_network(self, net):
+        print("Access 15")
         """Print the str and parameter number of a network.
 
         Args:
@@ -161,6 +176,7 @@ class BaseModel():
         logger.info(net_str)
 
     def _set_lr(self, lr_groups_l):
+        print("Access 16")
         """Set learning rate for warm-up.
 
         Args:
@@ -171,6 +187,7 @@ class BaseModel():
                 param_group['lr'] = lr
 
     def _get_init_lr(self):
+        print("Access 17")
         """Get the initial lr, which is set by the scheduler.
         """
         init_lr_groups_l = []
@@ -179,6 +196,7 @@ class BaseModel():
         return init_lr_groups_l
 
     def update_learning_rate(self, current_iter, warmup_iter=-1):
+        print("Access 18")
         """Update learning rate.
 
         Args:
@@ -202,10 +220,12 @@ class BaseModel():
             self._set_lr(warm_up_lr_l)
 
     def get_current_learning_rate(self):
+        print("Access 19")
         return [param_group['lr'] for param_group in self.optimizers[0].param_groups]
 
     @master_only
     def save_network(self, net, net_label, current_iter, param_key='params'):
+        print("Access 20")
         """Save networks.
 
         Args:
@@ -252,6 +272,7 @@ class BaseModel():
             # raise IOError(f'Cannot save {save_path}.')
 
     def _print_different_keys_loading(self, crt_net, load_net, strict=True):
+        print("Access 21")
         """Print keys with different name or different size when loading models.
 
         1. Print keys with different names.
@@ -287,6 +308,7 @@ class BaseModel():
                     load_net[k + '.ignore'] = load_net.pop(k)
 
     def load_network(self, net, load_path, strict=True, param_key='params'):
+        print("Access 22")
         """Load network.
 
         Args:
@@ -316,6 +338,7 @@ class BaseModel():
 
     @master_only
     def save_training_state(self, epoch, current_iter):
+        print("Access 23")
         """Save training states during training, which will be used for
         resuming.
 
@@ -350,6 +373,7 @@ class BaseModel():
                 # raise IOError(f'Cannot save {save_path}.')
 
     def resume_training(self, resume_state):
+        print("Access 24")
         """Reload the optimizers and schedulers for resumed training.
 
         Args:
@@ -365,6 +389,7 @@ class BaseModel():
             self.schedulers[i].load_state_dict(s)
 
     def reduce_loss_dict(self, loss_dict):
+        print("Access 25")
         """reduce loss dict.
 
         In distributed training, it averages the losses among different GPUs .
