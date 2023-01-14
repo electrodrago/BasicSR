@@ -16,7 +16,8 @@ class SRModel(BaseModel):
     """Base SR model for single image super-resolution."""
 
     def __init__(self, opt):
-        print("Access 26")
+        logger = get_root_logger()
+        logger.info("Access 26")
         super(SRModel, self).__init__(opt)
 
         # define network
@@ -34,7 +35,8 @@ class SRModel(BaseModel):
             self.init_training_settings()
 
     def init_training_settings(self):
-        print("Access 27")
+        logger = get_root_logger()
+        logger.info("Access 27")
         self.net_g.train()
         train_opt = self.opt['train']
 
@@ -73,7 +75,8 @@ class SRModel(BaseModel):
         self.setup_schedulers()
 
     def setup_optimizers(self):
-        print("Access 28")
+        logger = get_root_logger()
+        logger.info("Access 28")
         train_opt = self.opt['train']
         optim_params = []
         for k, v in self.net_g.named_parameters():
@@ -88,13 +91,15 @@ class SRModel(BaseModel):
         self.optimizers.append(self.optimizer_g)
 
     def feed_data(self, data):
-        print("Access 29")
+        logger = get_root_logger()
+        logger.info("Access 29")
         self.lq = data['lq'].to(self.device)
         if 'gt' in data:
             self.gt = data['gt'].to(self.device)
 
     def optimize_parameters(self, current_iter):
-        print("Access 30")
+        logger = get_root_logger()
+        logger.info("Access 30")
         self.optimizer_g.zero_grad()
         self.output = self.net_g(self.lq)
 
@@ -124,7 +129,8 @@ class SRModel(BaseModel):
             self.model_ema(decay=self.ema_decay)
 
     def test(self):
-        print("Access 31")
+        logger = get_root_logger()
+        logger.info("Access 31")
         if hasattr(self, 'net_g_ema'):
             self.net_g_ema.eval()
             with torch.no_grad():
@@ -136,7 +142,8 @@ class SRModel(BaseModel):
             self.net_g.train()
 
     def test_selfensemble(self):
-        print("Access 32")
+        logger = get_root_logger()
+        logger.info("Access 32")
         # TODO: to be tested
         # 8 augmentations
         # modified from https://github.com/thstkdgus35/EDSR-PyTorch
@@ -185,12 +192,14 @@ class SRModel(BaseModel):
         self.output = output.mean(dim=0, keepdim=True)
 
     def dist_validation(self, dataloader, current_iter, tb_logger, save_img):
-        print("Access 33")
+        logger = get_root_logger()
+        logger.info("Access 33")
         if self.opt['rank'] == 0:
             self.nondist_validation(dataloader, current_iter, tb_logger, save_img)
 
     def nondist_validation(self, dataloader, current_iter, tb_logger, save_img):
-        print("Access 34")
+        logger = get_root_logger()
+        logger.info("Access 34")
         dataset_name = dataloader.dataset.opt['name']
         with_metrics = self.opt['val'].get('metrics') is not None
         use_pbar = self.opt['val'].get('pbar', False)
@@ -258,7 +267,8 @@ class SRModel(BaseModel):
             self._log_validation_metric_values(current_iter, dataset_name, tb_logger)
 
     def _log_validation_metric_values(self, current_iter, dataset_name, tb_logger):
-        print("Access 35")
+        logger = get_root_logger()
+        logger.info("Access 35")
         log_str = f'Validation {dataset_name}\n'
         for metric, value in self.metric_results.items():
             log_str += f'\t # {metric}: {value:.4f}'
@@ -274,7 +284,8 @@ class SRModel(BaseModel):
                 tb_logger.add_scalar(f'metrics/{dataset_name}/{metric}', value, current_iter)
 
     def get_current_visuals(self):
-        print("Access 36")
+        logger = get_root_logger()
+        logger.info("Access 36")
         out_dict = OrderedDict()
         out_dict['lq'] = self.lq.detach().cpu()
         out_dict['result'] = self.output.detach().cpu()
@@ -283,7 +294,8 @@ class SRModel(BaseModel):
         return out_dict
 
     def save(self, epoch, current_iter):
-        print("Access 37")
+        logger = get_root_logger()
+        logger.info("Access 37")
         if hasattr(self, 'net_g_ema'):
             self.save_network([self.net_g, self.net_g_ema], 'net_g', current_iter, param_key=['params', 'params_ema'])
         else:

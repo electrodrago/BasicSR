@@ -15,13 +15,15 @@ from .video_base_model import VideoBaseModel
 class VideoRecurrentModel(VideoBaseModel):
 
     def __init__(self, opt):
-        print("Access 41")
+        logger = get_root_logger()
+        logger.info("Access 41")
         super(VideoRecurrentModel, self).__init__(opt)
         if self.is_train:
             self.fix_flow_iter = opt['train'].get('fix_flow')
 
     def setup_optimizers(self):
-        print("Access 42")
+        logger = get_root_logger()
+        logger.info("Access 42")
         train_opt = self.opt['train']
         flow_lr_mul = train_opt.get('flow_lr_mul', 1)
         logger = get_root_logger()
@@ -52,7 +54,8 @@ class VideoRecurrentModel(VideoBaseModel):
         self.optimizers.append(self.optimizer_g)
 
     def optimize_parameters(self, current_iter):
-        print("Access 43")
+        logger = get_root_logger()
+        logger.info("Access 43")
         if self.fix_flow_iter:
             logger = get_root_logger()
             if current_iter == 1:
@@ -67,7 +70,8 @@ class VideoRecurrentModel(VideoBaseModel):
         super(VideoRecurrentModel, self).optimize_parameters(current_iter)
 
     def dist_validation(self, dataloader, current_iter, tb_logger, save_img):
-        print("Access 44")
+        logger = get_root_logger()
+        logger.info("Access 44")
         dataset = dataloader.dataset
         dataset_name = dataset.opt['name']
         with_metrics = self.opt['val']['metrics'] is not None
@@ -178,7 +182,8 @@ class VideoRecurrentModel(VideoBaseModel):
                 self._log_validation_metric_values(current_iter, dataset_name, tb_logger)
 
     def test(self):
-        print("Access 45")
+        logger = get_root_logger()
+        logger.info("Access 45")
         n = self.lq.size(1)
         self.net_g.eval()
 
