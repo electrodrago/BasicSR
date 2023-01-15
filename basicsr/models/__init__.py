@@ -3,8 +3,8 @@ from copy import deepcopy
 from os import path as osp
 
 from basicsr.utils import get_root_logger, scandir
-from basicsr.utils.registry import MODEL_REGISTRY
-from basicsr.models.video_recurrent_model import VideoRecurrentModel
+#from basicsr.utils.registry import MODEL_REGISTRY
+from ..models.video_recurrent_model import VideoRecurrentModel
 
 __all__ = ['build_model']
 
