@@ -33,7 +33,6 @@ def create_train_val_dataloader(opt, logger):
         if phase == 'train':
             dataset_enlarge_ratio = dataset_opt.get('dataset_enlarge_ratio', 1)
             train_set = build_dataset(dataset_opt)
-            print(len(train_set))
             train_sampler = EnlargedSampler(train_set, opt['world_size'], opt['rank'], dataset_enlarge_ratio)
             train_loader = build_dataloader(
                 train_set,
@@ -42,7 +41,6 @@ def create_train_val_dataloader(opt, logger):
                 dist=opt['dist'],
                 sampler=train_sampler,
                 seed=opt['manual_seed'])
-            print(next(iter(train_loader)))
             num_iter_per_epoch = math.ceil(
                 len(train_set) * dataset_enlarge_ratio / (dataset_opt['batch_size_per_gpu'] * opt['world_size']))
             total_iters = int(opt['train']['total_iter'])
@@ -118,8 +116,8 @@ def train_pipeline(root_path):
     tb_logger = init_tb_loggers(opt)
 
     # create train and validation dataloaders
-    result = create_train_val_dataloader(opt, logger)
-    train_loader, train_sampler, val_loaders, total_epochs, total_iters = result
+    # result = create_train_val_dataloader(opt, logger)
+    # train_loader, train_sampler, val_loaders, total_epochs, total_iters = result
 
     # create model
     model = build_model(opt)
